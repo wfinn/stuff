@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# nodiffies you if the output of a command has changed
+
+# $1: command to be monitored (tip: sort the output if possible)
+# $2: name, used as title, event type and file name TODO: implement event type
+# $3: message to be send
+# $4: arguments to diff
+
+diffdir=$HOME/.nodiffy
+difffile="$diffdir/$2"
+
+if [ ! -d "$diffdir" ]
+then
+        mkdir $diffdir
+fi
+
+echo `date` $@ >> "$diffdir/nodiffy.log"
+
+if [ ! -f "$difffile" ]
+then
+        $1 > $difffile
+        exit
+fi
+
+mv "$difffile" "$difffile.old"
+$1 > "$difffile"
+diff=`diff $4 "$difffile.old" "$difffile"`
+
+if [ "$diff" != "" ]
+then
+        date=`date --rfc-3339=second | sed 's/ /,/g'`
+        cp "$difffile" "$difffile-$date"
+        cp "$difffile.old" "$difffile.old-$date"
+        sendpush "$2 - nodiffy" "$3 - diff:%0a$diff"
+fi
