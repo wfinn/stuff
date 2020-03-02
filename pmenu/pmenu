@@ -1,2 +1,2 @@
 #!/bin/sh
-pass -c `pass | awk '{print $2}' | tail -n +2 | dmenu`
+pass -c `find ~/.password-store/ -type f | grep .gpg$ | sed 's#.*\.password-store/##' | sed 's/.gpg$//' | dmenu`
