@@ -1,0 +1,4 @@
+#!/bin/sh
+curl --silent https://raw.githubusercontent.com/EdOverflow/can-i-take-over-xyz/master/README.md | grep -o '| Vulnerable     |[^|]*|' | sed "s/| Vulnerable     |[ ]*.//g" | sed 's/.[ ]*|//' | sort -u | grep -v "^$"
+# Maybe add forks?
+# curl --silent https://raw.githubusercontent.com/jhaddix/can-i-take-over-xyz/master/README.md | grep -v '|Yes||' | grep -o '|Yes|[^|)]*|' | sed 's/^|Yes|`//' | sed 's/`|$//g'
