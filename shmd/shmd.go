@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"flag"
 )
 
 func main() {
+	syntax := flag.String("s", "sh", "syntax highlighting: string to be put after a beginning ```.")
+	flag.Parse()
 	scanner := bufio.NewScanner(os.Stdin)
 	line := ""
 	linenr := 0
@@ -38,7 +41,7 @@ func main() {
 			if markdown {
 				fmt.Println("```")
 			} else {
-				fmt.Println("```sh")
+				fmt.Println("```" + *syntax)
 			}
 		}
 		if markdown {
