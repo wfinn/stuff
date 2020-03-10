@@ -35,7 +35,11 @@ func main() {
 			markdown = false
 		}
 		if markdown != waslastamarkdown {
-			fmt.Println("```")
+			if markdown {
+				fmt.Println("```")
+			} else {
+				fmt.Println("```sh")
+			}
 		}
 		if markdown {
 			line = line[1:]
