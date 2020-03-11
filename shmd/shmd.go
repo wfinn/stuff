@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	syntax := flag.String("s", "sh", "syntax highlighting: string to be put after a beginning ```.")
+	syntax := flag.String("s", "sh", "syntax highlighting: string to be put after a beginning `````.")
 	flag.Parse()
 	scanner := bufio.NewScanner(os.Stdin)
 	line := ""
@@ -30,6 +30,9 @@ func main() {
 			insidetruecomment = true
 		}
 		if insidetruecomment && strings.HasPrefix(line, "'") {
+			if line != "'" {
+				fmt.Println(line[1:])
+			}
 			skip = true
 			insidetruecomment = false
 		}
