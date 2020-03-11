@@ -8,6 +8,10 @@ You can use # before every line or : ' to begin and ' to end a comment block, th
 
 Might be useful for things like bug reports.
 
+```sh
+shmd < script.sh > script.md
+```
+
 Ideas:
 - Use <<something for special blocks? or <<htmltag?
 - Rewrite in shell
