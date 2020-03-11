@@ -26,6 +26,9 @@ func main() {
 			continue
 		}
 		if strings.HasPrefix(line, ": '") {
+			if line != ": '" {
+				fmt.Println(line[3:])
+			}
 			skip = true
 			insidetruecomment = true
 		}
@@ -47,7 +50,7 @@ func main() {
 				fmt.Println("```" + *syntax)
 			}
 		}
-		if markdown {
+		if markdown && !insidetruecomment {
 			line = line[1:]
 		}
 		if !skip {
