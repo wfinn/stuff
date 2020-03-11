@@ -1,0 +1,7 @@
+#!/bin/sh
+old=`mktemp`
+trap "rm $old; exit 1" 1 2 6 15
+ls /dev > $old
+echo "Insert or remove device and press enter"
+read
+ls /dev | diff - $old
