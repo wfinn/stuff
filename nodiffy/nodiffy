@@ -10,10 +10,7 @@
 diffdir=$HOME/.nodiffy
 difffile="$diffdir/$2"
 
-if [ ! -d "$diffdir" ]
-then
-        mkdir $diffdir
-fi
+[ ! -d "$diffdir" ] && mkdir $diffdir
 
 echo `date` $@ >> "$diffdir/nodiffy.log"
 
