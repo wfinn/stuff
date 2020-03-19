@@ -18,3 +18,6 @@ Quite some time ago I took a look at [zapread.com's GitHub repo](https://github.
 
 **80 goes to group**
 When I saw this, I had the idea for this bot.
+
+## Todo
+- probably move to only writing comments to be downvoted to be less spammy.
