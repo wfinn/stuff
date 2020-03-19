@@ -5,3 +5,4 @@ ls /dev > $old
 echo "Insert or remove device and press enter"
 read
 ls /dev | diff - $old
+rm $old
