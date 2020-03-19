@@ -5,12 +5,15 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"flag"
 	"github.com/wfinn/gozapread"
 )
 
 
 func main() {
-	if gozapread.Login("downvote2donate", "bbbbbb") != nil {
+	pass := flag.String("p", "bbbbbb", "password")
+	flag.Parse()
+	if gozapread.Login("downvote2donate", *pass) != nil {
 		fmt.Println("Login failed")
 		return
 	}
