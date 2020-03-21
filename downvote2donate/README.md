@@ -7,15 +7,11 @@ I'll reply with a comment you can downvote.
 ## Why?
 Quite some time ago I took a look at [zapread.com's GitHub repo](https://github.com/Horndev/zapread.com).
 
-```
-100 satoshi down vote:
-[...]
-80 goes to group
-10 goes to community
+100 satoshi down vote:  
+[...]  
+**80 goes to group**  
+10 goes to community  
 10 goes to zapread
-```
-
-**80 goes to group**
 
 ## ...
 I simply look for new messages every 20 minutes, so don't expect me to be fast.  
