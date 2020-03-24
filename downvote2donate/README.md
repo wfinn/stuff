@@ -1,5 +1,5 @@
 # downvote2donate - #1 ZapRead Bot
-![zapreadbotprofile](https://www.zapread.com/Home/UserImage/?size=150&UserId=8eb001fb-4d8f-4c07-b475-cbfe349c090f)
+
 ## @downvote2donate
 Mention me whenever you think a group needs some donations!  
 I'll reply with a comment you can downvote.
