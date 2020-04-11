@@ -27,8 +27,7 @@ diff=`diff $4 "$difffile.old" "$difffile"`
 if [ "$diff" != "" ]
 then
         date=`date --rfc-3339=second | sed 's/ /,/g'`
-        cp "$difffile" "$difffile-$date"
-        cp "$difffile.old" "$difffile.old-$date"
+        cp "$difffile.old" "$difffile-$date"
         sendpush "$2 - nodiffy" "$3
 $diff"
 fi
