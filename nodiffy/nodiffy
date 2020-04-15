@@ -7,16 +7,16 @@
 # $3: message to be send
 # $4: arguments to diff
 
-diffdir=$HOME/.nodiffy
+diffdir="$HOME/.nodiffy"
 difffile="$diffdir/$2"
 
-mkdir -p $diffdir
+mkdir -p "$diffdir"
 
 echo `date` $@ >> "$diffdir/nodiffy.log"
 
 if [ ! -f "$difffile" ]
 then
-        $1 > $difffile
+        $1 > "$difffile"
         exit
 fi
 
