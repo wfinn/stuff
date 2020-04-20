@@ -32,5 +32,5 @@ $3 & $4 are optional
 nodiffy date "datecheck" "times have changed"
 ```
 ## TODO
-- getopts (command is the default message title)
+- getopts (command is the default message title, -s do not send pushs, [-n show new lines instead of diff])
 - support categories (simplepush event types)
