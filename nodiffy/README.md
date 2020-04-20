@@ -8,10 +8,10 @@ A nice side effect of this is that you can link files from there to have an up-t
 ## sendpush
 
 You need to have a program called *sendpush* which accepts a title as first and message as second parameter.
-I use [Simplepush](https://simplepush.io/) for notifications, they have a script called send-encrypted.sh.
+I use [simplepush for easy push notifications](https://simplepush.io/), they have a script called send-encrypted.sh.
 Using that my *sendpush* looks like this:
 ```sh
-#/bin/sh
+#!/bin/sh
 send-encrypted.sh -k MySimplepushKey -p MyRandomPassword -s MySecretSalt -t "$1" -m "$2"
 ```
 Of course you can create your own *sendpush* if you don't want to use Simplepush.
@@ -31,3 +31,6 @@ $3 & $4 are optional
 ```sh
 nodiffy date "datecheck" "times have changed"
 ```
+## TODO
+- getopts (command is the default message title)
+- support categories (simplepush event types)
