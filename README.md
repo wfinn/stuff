@@ -1,1 +1,1 @@
-Stuff that doesn't deserve it's own repo (yet?)
+Stuff that doesn't deserve its own repo (yet?)
