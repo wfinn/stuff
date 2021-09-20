@@ -4,6 +4,5 @@ servedir=`mktemp -d`
 trap "rm -r $servedir; exit 1" 1 2 6 15
 cp -r "$@" $servedir
 cd $servedir
-ip r | head -n 1
 python3 -m http.server
 rm -r $old
