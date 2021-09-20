@@ -12,16 +12,16 @@ difffile="$diffdir/$2"
 
 mkdir -p "$diffdir"
 
-echo `date` $@ >> "$diffdir/nodiffy.log"
+echo `date` "$@" >> "$diffdir/nodiffy.log"
 
 if [ ! -f "$difffile" ]
 then
-        $1 > "$difffile"
+        "$1" > "$difffile"
         exit
 fi
 
 mv "$difffile" "$difffile.old"
-$1 > "$difffile"
+"$1" > "$difffile"
 diff=`diff $4 "$difffile.old" "$difffile"`
 
 if [ "$diff" != "" ]
