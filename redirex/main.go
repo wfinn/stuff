@@ -7,7 +7,7 @@ import (
 
 func main() {
 	if len(os.Args) != 3 {
-		fmt.Println("urlconfuse target.com malicious.com")
+		fmt.Println("redirex target.com malicious.com")
 		return
 	}
 	legit := os.Args[1]
