@@ -1,15 +1,11 @@
 # redirex
 
-This tool generates tons of bypasses for open redirects, but can also be used for SSRF etc.
+This tool generates a wordlist for open redirects.
 
-`go install github.com/wfinn/stuff/redirex@latest`
-
-`redirex legitdomain.com attacker.com`
-
+```sh
+go install github.com/wfinn/stuff/redirex@latest
+redirex -h
 ```
-.attacker.com
-https://legitdomain.com@attacker.com
-/%09/attacker.com
-https://legitdomain.com(.attacker.com
-...
-```
+
+Uses:
+- https://github.com/dbzer0/ipfmt MIT License
