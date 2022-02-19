@@ -36,16 +36,18 @@ func main() {
 		}
 	}
 
-	//Keep IPs and domains seperate for a while because we do not wanna generate subdomains on IPs
+	//Keep IPs and domains seperate for a while because we do not wanna generate .IP
 	ip := net.ParseIP(*attackerIP)
 	if ip == nil {
 		fmt.Fprintln(os.Stderr, "Couldn't parse IP")
+		return
 	}
 	ips := []string{"1.1", ipfmt.ToInt(ip), ipfmt.ToHex(ip), ipfmt.ToOctal(ip), ipfmt.ToSingleHex(ip), ipfmt.Combo(ip)}
 	for _, ip := range ips {
 		//e.g. @1.1
 		fmt.Println("@" + ip)
 	}
+	//Merge IPs and the other hosts
 	hosts = append(hosts, ips...)
 
 	//e.g. /\attacker.com
