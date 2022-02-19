@@ -4,7 +4,8 @@ This tool generates a wordlist for open redirects.
 
 ```sh
 go install github.com/wfinn/stuff/redirex@latest
-redirex -h
+redirex -target target.tld -attacker attacker.tld
+redirex -h # to see more options
 ```
 ---
 

