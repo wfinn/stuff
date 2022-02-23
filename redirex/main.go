@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/dbzer0/ipfmt/src/ipfmt"
+	tld "github.com/jpillora/go-tld"
 )
 
 func main() {
@@ -27,12 +28,16 @@ func main() {
 	//chars that end the host part
 	endhostchars := []string{"/", "?", "\\", "#"}
 
-	hosts := []string{*attackerdomain, *attackerdomain + "."}
+	hosts := []string{*attackerdomain}
 
 	for _, domain := range hosts {
 		//e.g. @attacker.com
 		for _, seperator := range seperators {
 			fmt.Println(seperator + domain)
+		}
+		//e.g. &.attacker.com
+		for _, char := range subdomainchars {
+			fmt.Println(char + "." + *attackerdomain + *path)
 		}
 	}
 
@@ -60,30 +65,38 @@ func main() {
 	fmt.Println("https://" + *attackerdomain + "/" + *proto + *target + *path)
 	//port as pass
 	for _, host := range hosts {
-		fmt.Println(*proto + *target + ":443@" + host)
+		fmt.Println(*proto + *target + ":443@" + host + *path)
 	}
 	//mutliple @s
 	fmt.Println("https://" + *target + "@" + *target + "@" + *attackerdomain + *path)
-	// unescaped dots in regexes & endsWith e.g. /www.victim.com/ -> wwwavictim.com
-	if len(strings.Split(*target, ".")) > 2 {
+	// unescaped dots in regexes & endsWith e.g. wwwavictim.com
+	if hasSubdomain(*target) {
 		fmt.Println(*proto + strings.Replace(*target, ".", "a", 1) + *path)
 	} else {
 		fmt.Println(*proto + "wwwa" + *target + *path)
 	}
 	//e.g. https://victim.com@attacker.com
 	for _, seperator := range seperators {
-		hosts = append(hosts, *target+seperator+*attackerdomain)
+		hosts = append(hosts, *target+seperator+*attackerdomain+*path)
 	}
 	//e.g. https://attacker.com#.victim.com
 	for _, char := range endhostchars {
-		hosts = append(hosts, *attackerdomain+char+"."+*target)
+		hosts = append(hosts, *attackerdomain+char+"."+*target+*path)
 	}
 	//e.g. https://victim.com(.attacker.com
 	for _, char := range subdomainchars {
-		hosts = append(hosts, *target+char+"."+*attackerdomain)
+		hosts = append(hosts, *target+char+"."+*attackerdomain+*path)
 	}
 
 	for _, domain := range hosts {
 		fmt.Println(*proto + domain + *path)
+	}
+}
+
+func hasSubdomain(domain string) bool {
+	if u, err := tld.Parse("http://" + domain); err != nil {
+		return false
+	} else {
+		return u.Subdomain != ""
 	}
 }

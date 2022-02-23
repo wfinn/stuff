@@ -21,3 +21,4 @@ To test for for redirects that require full urls use `echo "params" | sed 's#=/#
 
 Uses:
 - https://github.com/dbzer0/ipfmt MIT License
+- https://github.com/jpillora/go-tld MIT License
