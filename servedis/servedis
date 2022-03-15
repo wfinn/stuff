@@ -5,4 +5,4 @@ trap "rm -r $servedir; exit 1" 1 2 6 15
 cp -r "$@" $servedir
 cd $servedir
 python3 -m http.server
-rm -r $old
+rm -r $servedir
