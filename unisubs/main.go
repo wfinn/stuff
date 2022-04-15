@@ -4,13 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
 func main() {
 	n := flag.Int("n", 1, "number of strings to generate")
 	flag.Parse()
-	str := flag.Arg(0)
+	str := strings.Join(flag.Args(), " ")
 	if flag.NArg() < 1 {
 		fmt.Println("usage: unisubs [OPTIONS] \"text to change\"")
 		return
