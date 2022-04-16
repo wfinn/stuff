@@ -6,26 +6,29 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
 	tld "github.com/jpillora/go-tld"
 )
 
+var cookie string
+
 func main() {
-	concurrency := flag.Uint("c", 20, "concurrency")
+	goroutines := flag.Uint("r", 20, "go routines")
+	flag.StringVar(&cookie, "c", "", "cookie e.g. session=abc123")
 	flag.Parse()
 	urls := make(chan string)
 
 	// workers
 	var wg sync.WaitGroup
-	for i := 0; i < int(*concurrency); i++ {
+	for i := 0; i < int(*goroutines); i++ {
 		wg.Add(1)
 
 		c := getClient()
@@ -40,6 +43,11 @@ func main() {
 
 	sc := bufio.NewScanner(os.Stdin)
 
+	// read urls from command line
+	for _, u := range flag.Args() {
+		urls <- u
+	}
+	// read urls from stdin
 	for sc.Scan() {
 		urls <- sc.Text()
 	}
@@ -72,7 +80,6 @@ func getClient() *http.Client {
 }
 
 func testOrigins(c *http.Client, u string) {
-
 	pp, err := getPermutations(u)
 
 	if err != nil {
@@ -87,10 +94,12 @@ func testOrigins(c *http.Client, u string) {
 			return
 		}
 		req.Header.Set("Origin", p)
-
+		if cookie != "" {
+			req.Header.Set("Cookie", cookie)
+		}
 		resp, err := c.Do(req)
 		if resp != nil {
-			io.Copy(ioutil.Discard, resp.Body)
+			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 		}
 		if err != nil {
@@ -102,7 +111,7 @@ func testOrigins(c *http.Client, u string) {
 		acac := resp.Header.Get("Access-Control-Allow-Credentials")
 
 		if acao == p {
-			fmt.Printf("%s %s %s\n", u, p, acac)
+			fmt.Printf("Url: %s Origin: %s ACAC: %s\n", u, p, acac)
 		}
 	}
 }
@@ -129,19 +138,28 @@ func getPermutations(raw string) ([]string, error) {
 	}
 	origins = append(origins, patterns...)
 
+	origin := "https://" + u.Hostname()
 	//most of these only work on Safari like with redirex
 	subdomainchars := []string{",", "&", "'", "\"", ";", "!", "$", "^", "*", "(", ")", "+", "`", "~", "-", "_", "=", "|", "{", "}", "%", "%01", "%02", "%03", "%04", "%05", "%06", "%07", "%08", "%0b", "%0c", "%0e", "%0f", "%10", "%11", "%12", "%13", "%14", "%15", "%16", "%17", "%18", "%19", "%1a", "%1b", "%1c", "%1d", "%1e", "%1f", "%7f"}
 	for _, char := range subdomainchars {
-		origins = append(origins, "https://"+u.Hostname()+char+".evil.com")
+		// e.g. https://target.tld&.evil.com
+		origins = append(origins, origin+char+".evil.com")
 	}
 
 	if u, err := tld.Parse(raw); err == nil {
+		// e.g. https://wwwXtarget.tld
+		if u.Subdomain != "" {
+			origins = append(origins, strings.Replace(origin, ".", "x", 1))
+		} else {
+			origins = append(origins, "https"+"wwwx"+u.Hostname())
+		}
+		// e.g. https://target.wtf
 		if re, err := regexp.Compile(u.TLD + "$"); err == nil {
 			newTLD := "wtf"
 			if u.TLD == newTLD {
 				newTLD = "ooo"
 			}
-			origins = append(origins, re.ReplaceAllString("https://"+u.Host, newTLD))
+			origins = append(origins, re.ReplaceAllString(origin, newTLD))
 		}
 	}
 	return origins, nil
