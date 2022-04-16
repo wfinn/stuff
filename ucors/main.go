@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"crypto/tls"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,16 +11,20 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"sync"
 	"time"
+
+	tld "github.com/jpillora/go-tld"
 )
 
 func main() {
+	concurrency := flag.Uint("c", 20, "concurrency")
 	urls := make(chan string)
 
 	// workers
 	var wg sync.WaitGroup
-	for i := 0; i < 20; i++ {
+	for i := 0; i < int(*concurrency); i++ {
 		wg.Add(1)
 
 		c := getClient()
@@ -107,7 +112,7 @@ func getPermutations(raw string) ([]string, error) {
 		return []string{}, err
 	}
 
-	fixed := []string{
+	origins := []string{
 		"null",
 		"https://evil.com",
 		"http://evil.com",
@@ -117,12 +122,19 @@ func getPermutations(raw string) ([]string, error) {
 		"https://%s.evil.com",
 		"https://%sevil.com",
 	}
-
 	for i, p := range patterns {
 		patterns[i] = fmt.Sprintf(p, u.Hostname())
 	}
+	origins = append(origins, patterns...)
 
-	return append(fixed, patterns...), nil
-
+	if u, err := tld.Parse(raw); err == nil {
+		if re, err := regexp.Compile(u.TLD + "$"); err == nil {
+			newTLD := "wtf"
+			if u.TLD == newTLD {
+				newTLD = "com"
+			}
+			origins = append(origins, re.ReplaceAllString(raw, newTLD))
+		}
+	}
+	return origins, nil
 }
-
