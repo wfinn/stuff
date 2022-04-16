@@ -122,11 +122,18 @@ func getPermutations(raw string) ([]string, error) {
 	patterns := []string{
 		"https://%s.evil.com",
 		"https://%sevil.com",
+		"https://xssonanysubdomain.%s",
 	}
 	for i, p := range patterns {
 		patterns[i] = fmt.Sprintf(p, u.Hostname())
 	}
 	origins = append(origins, patterns...)
+
+	//most of these only work on Safari like with redirex
+	subdomainchars := []string{",", "&", "'", "\"", ";", "!", "$", "^", "*", "(", ")", "+", "`", "~", "-", "_", "=", "|", "{", "}", "%", "%01", "%02", "%03", "%04", "%05", "%06", "%07", "%08", "%0b", "%0c", "%0e", "%0f", "%10", "%11", "%12", "%13", "%14", "%15", "%16", "%17", "%18", "%19", "%1a", "%1b", "%1c", "%1d", "%1e", "%1f", "%7f"}
+	for _, char := range subdomainchars {
+		origins = append(origins, "https://"+u.Hostname()+char+".evil.com")
+	}
 
 	if u, err := tld.Parse(raw); err == nil {
 		if re, err := regexp.Compile(u.TLD + "$"); err == nil {
@@ -134,7 +141,7 @@ func getPermutations(raw string) ([]string, error) {
 			if u.TLD == newTLD {
 				newTLD = "ooo"
 			}
-			origins = append(origins, re.ReplaceAllString(raw, newTLD))
+			origins = append(origins, re.ReplaceAllString("https://"+u.Host, newTLD))
 		}
 	}
 	return origins, nil
