@@ -20,6 +20,7 @@ import (
 
 func main() {
 	concurrency := flag.Uint("c", 20, "concurrency")
+	flag.Parse()
 	urls := make(chan string)
 
 	// workers
@@ -131,7 +132,7 @@ func getPermutations(raw string) ([]string, error) {
 		if re, err := regexp.Compile(u.TLD + "$"); err == nil {
 			newTLD := "wtf"
 			if u.TLD == newTLD {
-				newTLD = "com"
+				newTLD = "ooo"
 			}
 			origins = append(origins, re.ReplaceAllString(raw, newTLD))
 		}
