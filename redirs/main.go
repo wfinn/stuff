@@ -39,7 +39,9 @@ func main() {
 						if loc, err := resp.Location(); err == nil {
 							if uu, err := url.Parse(u); err == nil {
 								if isInterestingRedirect(uu, loc) {
-									fmt.Println(u, "->", loc)
+									fmt.Println("from:\t" + u)
+									fmt.Println("to:\t" + loc.String())
+									fmt.Println()
 								}
 							}
 						}

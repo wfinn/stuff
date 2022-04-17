@@ -3,5 +3,6 @@
 find redirects in a list of urls
 
 ```sh
-cat urls.txt | redirs
+go install github.com/wfinn/stuff/redirs
+gau target.tld | grep -E "=/|=http" | uro | redirs
 ```
