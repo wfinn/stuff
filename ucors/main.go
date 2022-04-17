@@ -19,10 +19,12 @@ import (
 )
 
 var cookie string
+var printonly bool
 
 func main() {
 	goroutines := flag.Uint("r", 20, "go routines")
 	flag.StringVar(&cookie, "c", "", "cookie e.g. session=abc123")
+	flag.BoolVar(&printonly, "p", false, "only print the payloads")
 	flag.Parse()
 	urls := make(chan string)
 
@@ -88,7 +90,10 @@ func testOrigins(c *http.Client, u string) {
 	}
 
 	for _, p := range pp {
-
+		if printonly {
+			fmt.Println(p)
+			continue
+		}
 		req, err := http.NewRequest("GET", u, nil)
 		if err != nil {
 			return
@@ -123,9 +128,9 @@ func getPermutations(raw string) ([]string, error) {
 	}
 
 	origins := []string{
-		"null",
 		"https://evil.com",
 		"http://evil.com",
+		"null",
 	}
 
 	patterns := []string{
@@ -133,34 +138,36 @@ func getPermutations(raw string) ([]string, error) {
 		"https://%sevil.com",
 		"https://xssonanysubdomain.%s",
 	}
+
 	for i, p := range patterns {
 		patterns[i] = fmt.Sprintf(p, u.Hostname())
 	}
 	origins = append(origins, patterns...)
 
-	origin := "https://" + u.Hostname()
-	//most of these only work on Safari like with redirex
-	subdomainchars := []string{",", "&", "'", "\"", ";", "!", "$", "^", "*", "(", ")", "+", "`", "~", "-", "_", "=", "|", "{", "}", "%", "%01", "%02", "%03", "%04", "%05", "%06", "%07", "%08", "%0b", "%0c", "%0e", "%0f", "%10", "%11", "%12", "%13", "%14", "%15", "%16", "%17", "%18", "%19", "%1a", "%1b", "%1c", "%1d", "%1e", "%1f", "%7f"}
-	for _, char := range subdomainchars {
-		// e.g. https://target.tld&.evil.com
-		origins = append(origins, origin+char+".evil.com")
-	}
+	origin := u.Scheme + "://" + u.Host
 
 	if u, err := tld.Parse(raw); err == nil {
 		// e.g. https://wwwXtarget.tld
 		if u.Subdomain != "" {
 			origins = append(origins, strings.Replace(origin, ".", "x", 1))
 		} else {
-			origins = append(origins, "https"+"wwwx"+u.Hostname())
+			origins = append(origins, "https://"+"wwwx"+u.Hostname())
 		}
 		// e.g. https://target.wtf
-		if re, err := regexp.Compile(u.TLD + "$"); err == nil {
-			newTLD := "wtf"
+		if re, err := regexp.Compile("\\." + u.TLD); err == nil {
+			newTLD := ".wtf"
 			if u.TLD == newTLD {
-				newTLD = "ooo"
+				newTLD = ".ooo"
 			}
 			origins = append(origins, re.ReplaceAllString(origin, newTLD))
 		}
+	}
+
+	//most of these only work on Safari like with redirex
+	subdomainchars := []string{",", "&", "'", "\"", ";", "!", "$", "^", "*", "(", ")", "+", "`", "~", "-", "_", "=", "|", "{", "}", "%", "%01", "%02", "%03", "%04", "%05", "%06", "%07", "%08", "%0b", "%0c", "%0e", "%0f", "%10", "%11", "%12", "%13", "%14", "%15", "%16", "%17", "%18", "%19", "%1a", "%1b", "%1c", "%1d", "%1e", "%1f", "%7f"}
+	for _, char := range subdomainchars {
+		// e.g. https://target.tld&.evil.com
+		origins = append(origins, origin+char+".evil.com")
 	}
 	return origins, nil
 }
