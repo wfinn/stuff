@@ -10,9 +10,12 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 )
+
+var wwwregex = regexp.MustCompile("^www\\.")
 
 func main() {
 	routines := flag.Uint("r", 10, "go routines (concurrency)")
@@ -58,11 +61,10 @@ func main() {
 }
 
 func isInterestingRedirect(f, t *url.URL) bool {
-	re := regexp.MustCompile("^www\\.")
-	fromhost := re.ReplaceAllString(f.Hostname(), "")
-	tohost := re.ReplaceAllString(t.Hostname(), "")
-	from := fromhost + normalPath(f) + "?" + f.Query().Encode() + "#" + f.Fragment
-	to := tohost + normalPath(t) + "?" + t.Query().Encode() + "#" + t.Fragment
+	fromhost := normalHost(f)
+	tohost := normalHost(t)
+	from := fromhost + normalPath(f) + normalQuery(f) + normalFragment(f)
+	to := tohost + normalPath(t) + normalQuery(t) + normalFragment(t)
 	if from == to {
 		//seems to be http to https or normalization
 		return false
@@ -85,12 +87,31 @@ func isInterestingRedirect(f, t *url.URL) bool {
 	return true
 }
 
+func normalHost(u *url.URL) string {
+	return strings.ToLower(wwwregex.ReplaceAllString(u.Hostname(), ""))
+}
+
 func normalPath(u *url.URL) string {
 	path := u.EscapedPath()
 	if path == "" {
 		return "/"
 	}
 	return path
+}
+
+func normalQuery(u *url.URL) string {
+	query := u.Query().Encode()
+	if query == "" {
+		return ""
+	}
+	return "?" + query
+}
+
+func normalFragment(u *url.URL) string {
+	if u.Fragment == "" {
+		return ""
+	}
+	return "#" + u.Fragment
 }
 
 func getClient() *http.Client {
