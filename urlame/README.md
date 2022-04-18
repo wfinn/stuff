@@ -7,9 +7,9 @@ go install github.com/wfinn/stuff/urlame@latest
 cat urls.txt | urlame
 ```
 
-The core idea is to normalize urls e.g. https://localhost/123 and http://localhost/456 both become proto://localhost/NUMBER internally and urlame then only prints the first one.
+The core idea is to normalize urls e.g. https://localhost/123?x=ABC and http://localhost/456?x=123 both become https://localhost/%N%?x=%P% internally and urlame then only prints the first one.
 
-It also blacklists certain paths or file extensions like /static/ and .png.
+It also blacklists certain paths and file extensions like /static/ and .png.
 
 ---
 

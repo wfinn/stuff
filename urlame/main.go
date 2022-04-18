@@ -13,7 +13,7 @@ import (
 
 var numberregex = regexp.MustCompile("^\\d+$")
 var profilepageregex = regexp.MustCompile("^/(u|user|profile)/[^/]+/?$")
-var titleregex = regexp.MustCompile("^[a-zA-Z0-9-]+$")
+var titleregex = regexp.MustCompile("^[a-z0-9-]+$")
 
 var hashregex = regexp.MustCompile("^[a-zA-Z0-9]+$")
 var hashlens = []int{32, 40, 64, 128}
@@ -28,7 +28,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
-	cache := map[string]bool{}
+	seen := map[string]bool{}
 	stdin := bufio.NewScanner(os.Stdin)
 	for stdin.Scan() {
 		urlstr := stdin.Text()
@@ -38,10 +38,10 @@ func main() {
 				continue
 			}
 			normalized := normalizeUrl(urlstr)
-			if cache[normalized] {
+			if seen[normalized] {
 				continue
 			} else {
-				cache[normalized] = true
+				seen[normalized] = true
 			}
 			if *printNormalized {
 				fmt.Println(normalized)
@@ -83,7 +83,7 @@ func normalizeUrl(urlstr string) string {
 	if u, err := url.Parse(urlstr); err == nil {
 		newvals := url.Values{}
 		for key := range u.Query() {
-			newvals.Set(key, "URLVAL")
+			newvals.Set(key, "%P%")
 		}
 		return newUrl(u, normalizePath(u.Path), newvals)
 	}
@@ -102,12 +102,13 @@ func normalizePath(path string) string {
 }
 
 func normalizeItem(item string) string {
+	// it's unlikely that we have urls with %X% in them which we would miss here
 	if numberregex.MatchString(item) {
-		return "NUMBER"
+		return "%N%"
 	} else if postitle(item) {
-		return "TITLE"
+		return "%%T%"
 	} else if hash(item) {
-		return "HASH"
+		return "%H%"
 	}
 	return item
 }
@@ -135,11 +136,11 @@ func hash(str string) bool {
 }
 
 func newUrl(old *url.URL, path string, vals url.Values) string {
-	return "proto://" + cleanHostname(old) + path + "?" + vals.Encode() + "#" + old.Fragment
+	return /*ignore scheme*/ cleanHostname(old) + path + "?" + vals.Encode() + "#" + old.Fragment
 }
 
 func cleanHostname(u *url.URL) string {
-	if u.Port() == ":80" || u.Port() == ":443" {
+	if u.Port() == "80" || u.Port() == "443" {
 		return u.Hostname()
 	}
 	return u.Host
