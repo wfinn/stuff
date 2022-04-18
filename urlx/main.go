@@ -54,26 +54,26 @@ func println(str string) {
 
 func getPart(u *url.URL, part string) string {
 	switch strings.ToLower(part) {
-	case "scheme", "proto", "protocol":
+	case "scheme", "schemes", "proto", "protocol", "protocols":
 		return u.Scheme
-	case "user", "username":
+	case "user", "users", "username", "usernames":
 		return u.User.Username()
-	case "pass", "password":
+	case "pass", "password", "passwords":
 		pw, _ := u.User.Password()
 		return pw
-	case "login", "userinfo", "userpass", "usernamepassword":
+	case "login", "logins", "userinfo", "userpass", "usernamepassword":
 		return u.User.String()
-	case "domain", "host", "hostname":
+	case "domain", "domains", "host", "hosts", "hostname", "hostnames":
 		return u.Hostname()
-	case "port":
+	case "port", "ports":
 		return u.Port()
-	case "origin":
+	case "origin", "origins":
 		return u.Scheme + "://" + u.Host
-	case "path", "filename":
+	case "path", "paths", "filename", "filenames":
 		return u.Path
-	case "query", "params", "parameters":
+	case "query", "queries", "params", "parameters":
 		return u.RawQuery
-	case "fragment", "hash":
+	case "fragment", "fragments", "hash", "hashes":
 		return u.Fragment
 	}
 	return part
