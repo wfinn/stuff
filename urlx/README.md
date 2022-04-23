@@ -1,11 +1,20 @@
 # urlx
 
-extract parts from urls
+--get or --set parts of urls
 
 ```sh
-cat urls.txt | urlx path # get all paths
-cat urls.txt | urlx -u host # get unique hostnames
-cat urls.txt | urlx proto :// newhost.tld path '?' query '#' hash # change the host of every url
+cat urls.txt | urlx --get path '?' query # get all paths with and queries
+cat urls.txt | urlx --get -u host # get unique hostnames
+cat urls.txt | urlx --set host=target.tld # change the host of every url
+cat urls.txt | urlx --set path=/prefix{{value}} # prefix the path 
 ```
 
 urlx accepts many variatios for the names of "parts" so you shouldn't have to remember anything.
+
+```sh
+# these all do the same
+urlx --get hosts < urls.txt
+urlx --get hostname < urls.txt
+urlx --get domain < urls.txt
+# ...
+```
