@@ -10,14 +10,14 @@ import (
 
 func main() {
 	unique := flag.Bool("u", false, "unique")
-	https := flag.Bool("h", false, "set all urls to https://")
+	donthttps := flag.Bool("h", false, "do not set all urls to https://")
 	flag.Parse()
 	stdin := bufio.NewScanner(os.Stdin)
 	seen := map[string]bool{}
 	for stdin.Scan() {
 		if u, err := url.Parse(stdin.Text()); err == nil {
 			scheme := u.Scheme
-			if *https {
+			if !*donthttps {
 				scheme = "https"
 			}
 			cleaned := scheme + "://" + cleanHostname(u) + cleanPath(u) + cleanQuery(u) + cleanFragment(u)

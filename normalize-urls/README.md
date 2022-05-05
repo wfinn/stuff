@@ -7,4 +7,4 @@ When tools output stuff like `http://example.com:80/?` you can use this to norma
 - removes default ports
 
 - -u to remove duplicates
-- -h if you want to switch to https
+- -h if you dont want to switch all urls to https

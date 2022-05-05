@@ -22,7 +22,8 @@ var exts = []string{".js", ".css", ".png", ".jpg", ".jpeg", ".svg", ".gif", ".mp
 var paths = []string{"/static/", "/assets/", "/wp-content/", "/blog/", "/product/", "/docs/", "/support/"}
 
 func main() {
-	printNormalized := flag.Bool("n", false, "print the normalized version of the urls (for debugging)")
+	printNormalized := flag.Bool("print-normalized", false, "print the normalized version of the urls (for debugging)")
+	blockPaths := flag.Bool("block-paths", false, "block common paths like /static, /wp-content")
 	flag.Usage = func() {
 		fmt.Printf("cat urls.txt | %s [OPTIONS]\n", os.Args[0])
 		flag.PrintDefaults()
@@ -33,7 +34,7 @@ func main() {
 	for stdin.Scan() {
 		urlstr := stdin.Text()
 		if u, err := url.Parse(urlstr); err == nil {
-			if lamefiletype(u) || lamedir(u) || profilepage(u) {
+			if lamefiletype(u) || profilepage(u) || (*blockPaths && lamedir(u)) {
 				//skip those that we can be certain are lame
 				continue
 			}
