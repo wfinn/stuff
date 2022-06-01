@@ -10,26 +10,39 @@ import (
 )
 
 var dedupe bool
-var cache map[string]bool
+var seen = map[string]bool{}
 
 func main() {
 	flag.Usage = func() {
 		fmt.Printf("%s part\n", os.Args[0])
 		fmt.Println("Possible parts: protocol user password hostname port path query fragment ...")
+		fmt.Println("")
+		fmt.Println("--keys or --vals are special cases as they will print more than one line per url")
 		flag.PrintDefaults()
 	}
 	flag.BoolVar(&dedupe, "u", false, "don't print dupes")
+	printkeys := flag.Bool("keys", false, "print list of all query keys")
+	printvals := flag.Bool("vals", false, "print list of all query vals")
 	flag.Parse()
-	if flag.NArg() < 1 {
+	if flag.NArg() < 1 && !*printkeys && !*printvals {
 		flag.Usage()
 		return
-	}
-	if dedupe {
-		cache = map[string]bool{}
 	}
 	stdin := bufio.NewScanner(os.Stdin)
 	for stdin.Scan() {
 		if u, err := url.Parse(stdin.Text()); err == nil {
+			if *printkeys || *printvals {
+				for k, vals := range u.Query() {
+					if *printkeys {
+						println(k)
+					}
+					if *printvals {
+						for _, v := range vals {
+							println(v)
+						}
+					}
+				}
+			}
 			result := ""
 			for _, arg := range flag.Args() {
 				result += getPart(u, arg)
@@ -39,17 +52,6 @@ func main() {
 			}
 		}
 	}
-}
-
-func println(str string) {
-	if dedupe {
-		if cache[str] {
-			return
-		} else {
-			cache[str] = true
-		}
-	}
-	fmt.Println(str)
 }
 
 func getPart(u *url.URL, part string) string {
@@ -71,10 +73,21 @@ func getPart(u *url.URL, part string) string {
 		return u.Scheme + "://" + u.Host
 	case "path", "paths", "filename", "filenames":
 		return u.Path
-	case "query", "queries", "params", "parameters":
+	case "query", "queries", "params", "parameters", "search", "searches":
 		return u.RawQuery
 	case "fragment", "fragments", "hash", "hashes":
 		return u.Fragment
 	}
 	return part
+}
+
+func println(str string) {
+	if dedupe {
+		if seen[str] {
+			return
+		} else {
+			seen[str] = true
+		}
+	}
+	fmt.Println(str)
 }
