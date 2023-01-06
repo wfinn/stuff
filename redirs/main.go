@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 )
@@ -17,13 +18,11 @@ import (
 var wwwregex = regexp.MustCompile("^www\\.")
 
 func main() {
-	flag.Usage = func() {
-		fmt.Println("redirs - find (open) redirects automatically")
-		flag.PrintDefaults()
-	}
 	routines := flag.Uint("r", 1, "go routines (concurrency)")
 	cookies := flag.String("c", "", "cookies e.g. session=abc123")
-	authheader := flag.String("a", "", "Authorization header e.g. Bearer: abc123") //verify := flag.String("verify", "", "activates scanning! supply attacker domain")
+	authheader := flag.String("a", "", "Authorization header e.g. Bearer: abc123")
+	typical := flag.Bool("typical", false, "only check URLs that look like typical redirects")
+	interesting := flag.Bool("interesting", false, "only output interesting URLs")
 	flag.Parse()
 	s := bufio.NewScanner(os.Stdin)
 	urls := make(chan string)
@@ -35,6 +34,9 @@ func main() {
 			defer wg.Done()
 			for u := range urls {
 				fmt.Print(".")
+				if *typical && !looksLikeRedirect(u) {
+					continue
+				}
 				if req, err := http.NewRequest("GET", u, nil); err == nil {
 					if *cookies != "" {
 						req.Header.Set("Cookie", *cookies)
@@ -45,17 +47,15 @@ func main() {
 					if resp, err := c.Do(req); err == nil {
 						if loc, err := resp.Location(); err == nil {
 							if uu, err := url.Parse(u); err == nil {
-								if !isLameRedirect(uu, loc) {
+								if !isLameRedirect(uu, loc) || (*interesting && isInterestingRedirect(uu, loc)) {
 									if commonsubstr := getMaxLengthCommonString(u, loc.String()); len(commonsubstr) < 3 {
 										continue
 									} else {
-										fmt.Println() //remove this
-										fmt.Println("from:\t" + u)
-										fmt.Println("to:\t" + loc.String())
-										fmt.Println("->\t" + commonsubstr)
-										fmt.Println()
+										if !*interesting && isInterestingRedirect(uu, loc) {
+											fmt.Println("INTERESTING REDIRECT!")
+										}
+										fmt.Printf("from:\t%s\nto:\t%s\n->\t%s\n\n", u, loc.String(), commonsubstr)
 									}
-
 								}
 							}
 						}
@@ -87,6 +87,13 @@ func isLameRedirect(f, t *url.URL) bool {
 			return true
 		}
 	}
+	// error pages
+	lowerPath := strings.ToLower(t.Path)
+	for _, indicator := range []string{"error", "404", "oops"} {
+		if strings.Contains(lowerPath, indicator) {
+			return true
+		}
+	}
 	if f1, err := url.QueryUnescape(f.String()); err == nil {
 		if f2, err := url.QueryUnescape(t.String()); err == nil {
 			if f1 == f2 {
@@ -95,6 +102,19 @@ func isLameRedirect(f, t *url.URL) bool {
 			}
 		}
 	}
+	return false
+}
+
+func isInterestingRedirect(from, to *url.URL) bool {
+	// a query parameter contained the hostname we redirected to
+	for _, vals := range from.Query() {
+		for _, v := range vals {
+			if strings.Contains(v, to.Hostname()) {
+				return true
+			}
+		}
+	}
+	// to be continued ..?
 	return false
 }
 
