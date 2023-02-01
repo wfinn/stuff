@@ -12,10 +12,18 @@ import (
 	"strings"
 )
 
-var cache map[string]bool
+var seen = map[string]bool{}
 var min uint
 var max uint
-var splitregex = regexp.MustCompile("(<|>|\"|'|\\.|-|,|;|:|/|\\(|\\)|{|}|_)")
+
+var regexstrs = []string{
+	"(<|>|\"|'|\\.|-|,|;|:|/|\\(|\\)|{|}|_)", // generic splitter
+	"([|])",                                  // e.g. foo[bar]
+	"(\\(|\\))",                              // e.g. foo(bar)
+	"=",                                      // e.g. foo=bar
+
+}
+var regexes = compileregexes()
 
 func main() {
 	flag.UintVar(&min, "min", 3, "minimum length")
@@ -25,7 +33,6 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
-	cache = map[string]bool{}
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		if u, err := url.Parse(scanner.Text()); err == nil {
@@ -50,11 +57,14 @@ func main() {
 }
 
 func printWord(str string) {
-	_printUnique(str)
-	_printUnique(strings.TrimSuffix(str, path.Ext(str)))
-	for _, s := range splitregex.Split(str, -1) {
-		_printUnique(s)
+	printUnique(str)
+	printUnique(strings.TrimSuffix(str, path.Ext(str)))
+	for _, r := range regexes {
+		for _, s := range r.Split(str, -1) {
+			printUnique(s)
+		}
 	}
+
 }
 
 func printWords(strs []string) {
@@ -63,10 +73,18 @@ func printWords(strs []string) {
 	}
 }
 
-func _printUnique(str string) {
+func printUnique(str string) {
 	l := uint(len(str))
-	if l >= min && (max == 0 || l <= max) && strings.TrimSpace(str) != "" && !cache[str] {
-		cache[str] = true
+	if l >= min && (max == 0 || l <= max) && strings.TrimSpace(str) != "" && !seen[str] {
+		seen[str] = true
 		fmt.Println(str)
 	}
+}
+
+func compileregexes() []*regexp.Regexp {
+	result := []*regexp.Regexp{}
+	for _, regex := range regexstrs {
+		result = append(result, regexp.MustCompile(regex))
+	}
+	return result
 }
