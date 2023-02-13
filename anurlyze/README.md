@@ -1,6 +1,6 @@
-# anurlize
+# anurlyze
 
-Tool to analize a list of URLs.
+Tool to analyze a list of URLs.
 
 This can quess the types of content in query parameters.
 
