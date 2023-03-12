@@ -26,13 +26,15 @@ Supported types are:
 - JSON
 - XML
 - Hash_(MD5, SHA-1, SHA-256, MD5, SHA-224, SHA-384, SHA-512, Blake2, Whirlpool) e.g. Hash_SHA-256
+- IP (IPv4, IPv6)
+- Langcode
 
 Coming soon, maybe:
 - Filename (using extensions)
-- Langcode
 - Phone Number
 - Email
-- IP
+
+Types are sorted, so you can grep for multiples by using things like: `grep 'Types: .*Bool.*Hash_MD5'`.
 
 ---
 
