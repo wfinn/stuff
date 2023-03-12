@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -165,7 +166,8 @@ func main() {
 		}
 
 		// Join the slice of types into a comma-separated string
-		typesStr := strings.Join(typeSlice, ",") // FIXME this needs to be sorted so multiple types can be grepped
+		sort.Strings(typeSlice)
+		typesStr := strings.Join(typeSlice, ",")
 		if typesStr == "" {
 			typesStr = "None"
 		}

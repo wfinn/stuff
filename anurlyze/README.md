@@ -6,8 +6,8 @@ This can quess the types of content in query parameters and path segments.
 
 Output looks like:
 ```
-Url: https://example.org/download?id=123&authtoken=5003deb5d66a25a1f8726204d2cf4098 Types: Int,Hash_MD5
-Url: https://example.org/file/123?loggedin=true Types: Int,Bool
+Url: https://example.org/download?id=123&authtoken=5003deb5d66a25a1f8726204d2cf4098 Types: Hash_MD5,Int
+Url: https://example.org/file/123?loggedin=true Types: Bool,Int
 Url: https://example.org/upload Types: None
 ...
 ```
