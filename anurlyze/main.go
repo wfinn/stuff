@@ -25,7 +25,7 @@ var sha224Regex = regexp.MustCompile(`^[a-fA-F0-9]{56}$`)
 var sha512Regex = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
 var blake2Regex = regexp.MustCompile(`^[a-fA-F0-9]{64}$`)
 var whirlpoolRegex = regexp.MustCompile(`^[a-fA-F0-9]{128}$`)
-var urlRegex = regexp.MustCompile(`^https?://`)
+var urlRegex = regexp.MustCompile(`^https?://.+`)
 
 var emptyinterface interface{}
 
