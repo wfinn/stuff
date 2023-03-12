@@ -14,7 +14,7 @@ Url: https://example.org/upload Types: None
 
 E.g., when you want to find URLs where parameters or path segments contain JSON do:
 ```sh
-cat urls.txt | anurlize | grep 'Types: .*JSON'
+cat urls.txt | anurlyze | grep 'Types: .*JSON'
 ```
 
 Supported types are:
