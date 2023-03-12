@@ -6,3 +6,5 @@ getallwords (gaw) generates a wordlist from a list of urls, like from [gau](http
 gau target.tld > urls.txt
 gaw < urls.txt > wordlist.txt
 ```
+
+This does not make any requests, it justs splits up the URL into many parts.
