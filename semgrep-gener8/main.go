@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,21 +10,31 @@ import (
 )
 
 func main() {
+	lang := flag.String("lang", "generic", "language")
+	flag.Parse()
 	input, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error reading input: %v\n", err)
 		os.Exit(1)
 	}
 	lines := strings.Split(strings.TrimSpace(string(input)), "\n")
-	fmt.Printf("rules:\n  - id: change_id_here\n    message: change message here\n    severity: WARNING\n    languages:\n      - generic\n")
-
+	fmt.Printf(`rules:
+  - id: change_id_here
+    message: change message here
+    severity: WARNING
+    languages:
+      - %s
+`, *lang)
 	functionNames := make([]string, len(lines))
 	for i, line := range lines {
 		parts := strings.Split(line, "(")
 		functionName := parts[0]
 		functionNames[i] = functionName + "(...)"
 	}
-	fmt.Printf("    patterns:\n    - pattern-either:\n      - pattern: %s\n", strings.Join(functionNames, "\n      - pattern: "))
+	fmt.Printf(`    patterns:
+    - pattern-either:
+      - pattern: %s
+`, strings.Join(functionNames, "\n      - pattern: "))
 
 	for _, line := range lines {
 		parts := strings.Split(line, "(")
